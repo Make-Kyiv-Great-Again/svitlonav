@@ -7,7 +7,7 @@ SvitloNav is a pedestrian routing system that generates walking routes through i
 ![Code Size](https://img.shields.io/github/languages/code-size/Make-Kyiv-Great-Again/svitlonav?style=for-the-badge&labelColor=160E21&color=B073FF)
 ![Repository Size](https://img.shields.io/github/repo-size/Make-Kyiv-Great-Again/svitlonav?style=for-the-badge&color=B073FF&labelColor=160E21)
 ![Last Commit](https://img.shields.io/github/last-commit/Make-Kyiv-Great-Again/svitlonav?style=for-the-badge&color=B073FF&labelColor=160E21)
-![License](https://img.shields.io/github/license/Make-Kyiv-Great-Again/svitlonav?style=for-the-badge&color=B073FF&labelColor=160E21)
+![GitHub License](https://img.shields.io/github/license/Make-Kyiv-Great-Again/svitlonav?style=for-the-badge&labelColor=160E21&color=B073FF)
 
 ![Go](https://img.shields.io/badge/Go-1.24+-B073FF?style=for-the-badge&logo=go&logoColor=white&labelColor=160E21)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-B073FF?style=for-the-badge&logo=postgresql&logoColor=white&labelColor=160E21)
