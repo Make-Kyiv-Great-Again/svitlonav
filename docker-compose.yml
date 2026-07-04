@@ -1,0 +1,57 @@
+version: '3.9'
+
+services:
+  # DO NOT USE, run locally instead
+  api:
+    build: .
+    container_name: svitlonav-api
+    ports:
+      - "8080:8080"
+    environment:
+      - DATABASE_URL=postgres://svitlo:svitlo@postgis:5432/svitlonav?sslmode=disable
+      - VALHALLA_URL=http://valhalla:8002
+      - DTEK_API_URL=https://svitlo-finder.xyz
+      - LAMP_RADIUS_METERS=25
+    depends_on:
+      postgis:
+        condition: service_healthy
+      valhalla:
+        condition: service_started
+    restart: unless-stopped
+
+  postgis:
+    image: postgis/postgis:16-3.4
+    container_name: svitlonav-postgis
+    environment:
+      - POSTGRES_USER=svitlo
+      - POSTGRES_PASSWORD=svitlo
+      - POSTGRES_DB=svitlonav
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./migrations:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U svitlo -d svitlonav"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  valhalla:
+    image: ghcr.io/gis-ops/docker-valhalla/valhalla:latest
+    container_name: svitlonav-valhalla
+    ports:
+      - "8002:8002"
+    volumes:
+      - ./valhalla_data:/custom_files
+    environment:
+      # - tile_urls=https://download.geofabrik.de/europe/ukraine-latest.osm.pbf
+      - use_tiles_ignore_pbf=False
+      - build_elevation=False
+      - build_admins=False
+      - build_time_zones=False
+      - force_rebuild=True
+    restart: unless-stopped
+
+volumes:
+  pgdata:

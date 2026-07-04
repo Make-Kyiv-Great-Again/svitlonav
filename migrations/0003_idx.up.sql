@@ -1,0 +1,1 @@
+CREATE INDEX idx_lamps_geog ON lamps USING GIST (geog);

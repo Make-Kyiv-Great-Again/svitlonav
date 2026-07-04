@@ -1,0 +1,49 @@
+# Binaries
+bin/
+dist/
+build/
+
+# Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Coverage
+coverage.out
+coverage.html
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+
+# Logs
+*.log
+
+# OSM datasets
+lamps.osm.pbf
+kyiv_lit.osm.pbf
+
+# Valhalla generated data
+valhalla_data/*.gph
+valhalla_data/*.sqlite
+valhalla_data/*.tar
+valhalla_data/*.bin
+valhalla_data/tiles/
+
+# PostgreSQL
+postgres_data/
+
+# Docker
+docker-volumes/

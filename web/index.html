@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SvitloNav</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+  html, body { margin: 0; height: 100%; font-family: system-ui, sans-serif; }
+  #app { display: flex; flex-direction: column; height: 100%; }
+  #panel {
+    padding: 12px 16px;
+    background: #1c1c1c;
+    color: #eee;
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .coord-box { display: flex; gap: 12px; font-size: 13px; color: #ccc; }
+  .coord-box span { color: #eee; font-weight: 500; }
+  #panel button {
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: none;
+    background: #2f8f5b;
+    color: white;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 13px;
+  }
+  #panel button:disabled { background: #555; cursor: default; }
+  #status { font-size: 13px; color: #aaa; width: 100%; margin-bottom: -4px; }
+  #map { flex: 1; cursor: crosshair; }
+  .legend {
+    background: rgba(28,28,28,0.9);
+    color: #eee;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    line-height: 1.7;
+  }
+  .legend .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="panel">
+    <div id="status">Click on the map to select Start and Finish points.</div>
+    <div class="coord-box">Start: <span id="startCoords">Not selected</span></div>
+    <div class="coord-box">Finish: <span id="finishCoords">Not selected</span></div>
+    <button id="buildBtn" disabled>Build Route</button>
+  </div>
+  <div id="map"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+const map = L.map('map').setView([50.4505, 30.5235], 16);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+
+const legend = L.control({ position: 'bottomright' });
+legend.onAdd = function () {
+  const div = L.DomUtil.create('div', 'legend');
+  div.innerHTML =
+    '<div><span class="dot" style="background:#2f8f5b"></span>Start</div>' +
+    '<div><span class="dot" style="background:#d85a30"></span>Finish</div>' +
+    '<div><span class="dot" style="background:#f2b705"></span>Lamps (A* graph)</div>' +
+    '<div><span class="dot" style="background:#378ADD"></span>Route</div>';
+  return div;
+};
+legend.addTo(map);
+
+let routeLayer = null;
+let lampLayer = null;
+let markerLayer = null;
+
+let fromLatLng = null;
+let toLatLng = null;
+let clickMarkers = L.layerGroup().addTo(map);
+
+function formatCoords(latlng) {
+  return latlng.lat.toFixed(5) + ', ' + latlng.lng.toFixed(5);
+}
+
+map.on('click', function(e) {
+  if (!fromLatLng) {
+    fromLatLng = e.latlng;
+    L.circleMarker(fromLatLng, { radius: 8, color: '#1d6b41', fillColor: '#2f8f5b', fillOpacity: 1, weight: 2 }).addTo(clickMarkers);
+    document.getElementById('startCoords').textContent = formatCoords(fromLatLng);
+    document.getElementById('status').textContent = 'Start selected. Now click to select Finish.';
+  } else if (!toLatLng) {
+    toLatLng = e.latlng;
+    L.circleMarker(toLatLng, { radius: 8, color: '#993c1d', fillColor: '#d85a30', fillOpacity: 1, weight: 2 }).addTo(clickMarkers);
+    document.getElementById('finishCoords').textContent = formatCoords(toLatLng);
+    document.getElementById('status').textContent = 'Points selected. Ready to build route.';
+    document.getElementById('buildBtn').disabled = false;
+  } else {
+    fromLatLng = e.latlng;
+    toLatLng = null;
+    clickMarkers.clearLayers();
+    if (routeLayer) map.removeLayer(routeLayer);
+    if (lampLayer) map.removeLayer(lampLayer);
+    if (markerLayer) map.removeLayer(markerLayer);
+    L.circleMarker(fromLatLng, { radius: 8, color: '#1d6b41', fillColor: '#2f8f5b', fillOpacity: 1, weight: 2 }).addTo(clickMarkers);
+    document.getElementById('startCoords').textContent = formatCoords(fromLatLng);
+    document.getElementById('finishCoords').textContent = 'Not selected';
+    document.getElementById('status').textContent = 'New Start selected. Click to select Finish.';
+    document.getElementById('buildBtn').disabled = true;
+  }
+});
+
+async function buildRoute() {
+  const btn = document.getElementById('buildBtn');
+  const status = document.getElementById('status');
+  btn.disabled = true;
+  status.textContent = 'Building route...';
+
+  const from = { lat: fromLatLng.lat, lon: fromLatLng.lng };
+  const to = { lat: toLatLng.lat, lon: toLatLng.lng };
+
+  try {
+    const res = await fetch('/api/route', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ from, to }),
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(text || res.statusText);
+    }
+
+    const data = await res.json();
+
+    clickMarkers.clearLayers();
+    if (routeLayer) map.removeLayer(routeLayer);
+    if (lampLayer) map.removeLayer(lampLayer);
+    if (markerLayer) map.removeLayer(markerLayer);
+
+    const routeLatLngs = (data.route || []).map(p => [p[0], p[1]]);
+    routeLayer = L.polyline(routeLatLngs, { color: '#378ADD', weight: 4, opacity: 0.9 }).addTo(map);
+
+    lampLayer = L.layerGroup(
+      (data.lamps || []).map(l =>
+        L.circleMarker([l.lat, l.lon], {
+          radius: 5,
+          color: '#a67405',
+          fillColor: '#f2b705',
+          fillOpacity: 1,
+          weight: 1,
+        }).bindTooltip('lamp #' + l.id)
+      )
+    ).addTo(map);
+
+    markerLayer = L.layerGroup([
+      L.circleMarker([from.lat, from.lon], { radius: 8, color: '#1d6b41', fillColor: '#2f8f5b', fillOpacity: 1, weight: 2 }),
+      L.circleMarker([to.lat, to.lon], { radius: 8, color: '#993c1d', fillColor: '#d85a30', fillOpacity: 1, weight: 2 }),
+    ]).addTo(map);
+
+    if (routeLatLngs.length > 0) {
+      map.fitBounds(routeLayer.getBounds(), { padding: [30, 30] });
+    }
+    status.textContent = 'Route built: ' + (data.lamps || []).length + ' lamps in chain.';
+  } catch (err) {
+    status.textContent = 'Error: ' + err.message;
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+document.getElementById('buildBtn').addEventListener('click', buildRoute);
+</script>
+</body>
+</html>
