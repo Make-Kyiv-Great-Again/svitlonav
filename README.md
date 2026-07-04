@@ -3,24 +3,18 @@
 SvitloNav is a pedestrian routing system that generates walking routes through illuminated streets using OpenStreetMap streetlight data. It combines PostgreSQL/PostGIS for spatial queries and Valhalla as the routing engine to prefer well-lit roads whenever possible.
 
 
-<p>
+![Top Language](https://img.shields.io/github/languages/top/Make-Kyiv-Great-Again/svitlonav?style=for-the-badge&color=B073FF&labelColor=160E21)
+![Code Size](https://img.shields.io/github/languages/code-size/Make-Kyiv-Great-Again/svitlonav?style=for-the-badge&labelColor=160E21&color=B073FF)
+![Repository Size](https://img.shields.io/github/repo-size/Make-Kyiv-Great-Again/svitlonav?style=for-the-badge&color=B073FF&labelColor=160E21)
+![Last Commit](https://img.shields.io/github/last-commit/Make-Kyiv-Great-Again/svitlonav?style=for-the-badge&color=B073FF&labelColor=160E21)
+![License](https://img.shields.io/github/license/Make-Kyiv-Great-Again/svitlonav?style=for-the-badge&color=B073FF&labelColor=160E21)
 
-<img src="https://img.shields.io/github/languages/top/Make-Kyiv-Great-Again/svitlonav?style=for-the-badge&color=B073FF&labelColor=160E21">
-<img src="https://img.shields.io/github/languages/code-size/Make-Kyiv-Great-Again/svitlonav?style=for-the-badge&color=B073FF&labelColor=160E21">
-<img src="https://img.shields.io/github/repo-size/Make-Kyiv-Great-Again/svitlonav?style=for-the-badge&color=B073FF&labelColor=160E21">
-<img src="https://img.shields.io/github/last-commit/Make-Kyiv-Great-Again/svitlonav?style=for-the-badge&color=B073FF&labelColor=160E21">
-<img src="https://img.shields.io/github/license/Make-Kyiv-Great-Again/svitlonav?style=for-the-badge&color=B073FF&labelColor=160E21">
-
-<br>
-
-<img src="https://img.shields.io/badge/Go-1.24+-B073FF?style=for-the-badge&logo=go&logoColor=white&labelColor=160E21">
-<img src="https://img.shields.io/badge/PostgreSQL-16-B073FF?style=for-the-badge&logo=postgresql&logoColor=white&labelColor=160E21">
-<img src="https://img.shields.io/badge/PostGIS-Spatial-B073FF?style=for-the-badge&labelColor=160E21">
-<img src="https://img.shields.io/badge/Valhalla-Routing-B073FF?style=for-the-badge&labelColor=160E21">
-<img src="https://img.shields.io/badge/OpenStreetMap-Data-B073FF?style=for-the-badge&logo=openstreetmap&logoColor=white&labelColor=160E21">
-<img src="https://img.shields.io/badge/Docker-Compose-B073FF?style=for-the-badge&logo=docker&logoColor=white&labelColor=160E21">
-
-</p>
+![Go](https://img.shields.io/badge/Go-1.24+-B073FF?style=for-the-badge&logo=go&logoColor=white&labelColor=160E21)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-B073FF?style=for-the-badge&logo=postgresql&logoColor=white&labelColor=160E21)
+![PostGIS](https://img.shields.io/badge/PostGIS-Spatial-B073FF?style=for-the-badge&labelColor=160E21)
+![Valhalla](https://img.shields.io/badge/Valhalla-Routing-B073FF?style=for-the-badge&labelColor=160E21)
+![OpenStreetMap](https://img.shields.io/badge/OpenStreetMap-Data-B073FF?style=for-the-badge&logo=openstreetmap&logoColor=white&labelColor=160E21)
+![Docker](https://img.shields.io/badge/Docker-Compose-B073FF?style=for-the-badge&logo=docker&logoColor=white&labelColor=160E21)
 
 
 ![SvitloNav demo](docs/demo2.png)
