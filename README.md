@@ -1,6 +1,9 @@
 # SvitloNav
 
-<p align="center">
+SvitloNav is a pedestrian routing system that generates walking routes through illuminated streets using OpenStreetMap streetlight data. It combines PostgreSQL/PostGIS for spatial queries and Valhalla as the routing engine to prefer well-lit roads whenever possible.
+
+
+<p>
 
 <img src="https://img.shields.io/github/languages/top/Make-Kyiv-Great-Again/svitlonav?style=for-the-badge&color=B073FF&labelColor=160E21">
 <img src="https://img.shields.io/github/languages/code-size/Make-Kyiv-Great-Again/svitlonav?style=for-the-badge&color=B073FF&labelColor=160E21">
@@ -20,11 +23,9 @@
 </p>
 
 
-SvitloNav is a pedestrian routing system that generates walking routes through illuminated streets using OpenStreetMap streetlight data. It combines PostgreSQL/PostGIS for spatial queries and Valhalla as the routing engine to prefer well-lit roads whenever possible.
-
 ![SvitloNav demo](docs/demo2.png)
 <p align="center">
-<a href="[https://your-demo-link](https://make-kyiv-great-again.github.io/svitlonav/demovid.mp4)">
+<a href="https://make-kyiv-great-again.github.io/svitlonav/demovid.mp4">
 <img src="https://img.shields.io/badge/▶_Watch_Demo-B073FF?style=for-the-badge&labelColor=160E21">
 </a>
 </p>
@@ -195,6 +196,60 @@ go run cmd/api/main.go
 Rebuilding routing graphs is only necessary after updating `kyiv_lit.osm.pbf`.
 
 Re-importing streetlights is only necessary after updating `lamps.osm.pbf`.
+
+# Adding a New Region
+
+SvitloNav is not limited to Kyiv. To add support for another city or region, you need both a routing dataset and a streetlight dataset.
+
+## 1. Download an OSM extract
+
+Download the `.osm.pbf` file for the desired region from a provider such as Geofabrik or BBBike.
+
+## 2. Build the streetlight dataset
+
+Extract streetlights from the downloaded OSM file using `osmium`.
+
+For example:
+
+```bash
+osmium tags-filter region.osm.pbf n/highway=street_lamp -o lamps.osm.pbf
+```
+
+Replace the existing `lamps.osm.pbf` in the project root with the generated file.
+
+## 3. Prepare Valhalla data
+
+Copy the original regional OSM extract into the `valhalla_data/` directory and rename it if necessary.
+
+```
+valhalla_data/
+└── region.osm.pbf
+```
+
+Update the builder configuration if it expects a different filename.
+
+## 4. Rebuild the routing data
+
+Restart the infrastructure to regenerate Valhalla routing tiles:
+
+```bash
+make infra-down
+make infra-up
+```
+
+Then import the new streetlights:
+
+```bash
+go run cmd/import-lamps/main.go
+```
+
+Finally, rebuild the routing graphs:
+
+```bash
+go run cmd/build-graphs/main.go
+```
+
+After these steps, SvitloNav will use the new region for routing and streetlight visualization.
 
 ---
 
