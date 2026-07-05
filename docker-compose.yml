@@ -50,7 +50,7 @@ services:
       - build_elevation=False
       - build_admins=False
       - build_time_zones=False
-      - force_rebuild=True
+      # - force_rebuild=True
     restart: unless-stopped
 
 volumes:
