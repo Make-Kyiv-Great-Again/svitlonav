@@ -167,6 +167,54 @@ http://localhost:8080
 
 ---
 
+## API Usage
+
+### `POST /api/route`
+
+Computes a pedestrian route between two points, biased toward well-lit streets, and returns nearby streetlights for visualization.
+
+**Request body**
+
+```json
+{
+  "from": { "lat": 50.4501, "lon": 30.5234 },
+  "to":   { "lat": 50.4547, "lon": 30.5238 }
+}
+```
+
+**Response body**
+
+```json
+{
+  "route": [
+    [50.4501, 30.5234],
+    [50.4503, 30.5236],
+    [50.4547, 30.5238]
+  ],
+  "lamps": [
+    { "id": 12345, "lat": 50.4502, "lon": 30.5235 }
+  ]
+}
+```
+
+- `route` is an ordered list of `[lat, lon]` points along the walking path.
+- `lamps` are streetlights within `lampDisplayRadiusM` (currently 25m) of the route, pulled from PostGIS via `LampsNearLine`.
+
+**Example**
+
+```bash
+curl -X POST http://localhost:8080/api/route \
+  -H "Content-Type: application/json" \
+  -d '{
+    "from": {"lat": 50.4501, "lon": 30.5234},
+    "to":   {"lat": 50.4547, "lon": 30.5238}
+  }'
+```
+
+### `GET /api/health`
+
+Returns `200 OK` with body `API is running!`. Useful for container healthchecks / uptime probes.
+
 # Development Workflow
 
 Typical setup:
